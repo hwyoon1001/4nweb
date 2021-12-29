@@ -21,7 +21,7 @@ function listAlbums() {
     Delimiter: '/'
   }, function (err, data) {
     if (err) {
-      return alert('There was an error listing your albums: ' + err.message);
+      return alert('There was an error listing your directory: ' + err.message);
     } else {
       console.log('앨범', data.CommonPrefixes)
       var albums = data.CommonPrefixes.map(function (commonPrefix) {
@@ -48,7 +48,7 @@ function listAlbums() {
         '<ul>',
         getHtml(albums),
         '</ul>',
-        '<button onclick="createAlbum(prompt(\'Enter Album Name:\'))">',
+        '<button onclick="createAlbum(prompt(\'Enter directory Name:\'))">',
         'Create New Directory',
         '</button>'
       ]
@@ -67,17 +67,17 @@ function deleteCheck(albumName){
 function createAlbum(albumName) {
   albumName = albumName.trim();
   if (!albumName) {
-    return alert('Album names must contain at least one non-space character.');
+    return alert('directory names must contain at least one non-space character.');
   }
   if (albumName.indexOf('/') !== -1) {
-    return alert('Album names cannot contain slashes.');
+    return alert('directory names cannot contain slashes.');
   }
   var albumKey = encodeURIComponent(albumName) + '/';
   s3.headObject({
     Key: albumKey
   }, function (err, data) {
     if (!err) {
-      return alert('Album already exists.');
+      return alert('directory already exists.');
     }
     if (err.code !== 'NotFound') {
       return alert('There was an error creating your directory: ' + err.message);
@@ -100,7 +100,7 @@ function viewAlbum(albumName) {
     Prefix: albumPhotosKey
   }, function (err, data) {
     if (err) {
-      return alert('There was an error viewing your album: ' + err.message);
+      return alert('There was an error viewing your directory: ' + err.message);
     }
     // 'this' references the AWS.Response instance that represents the response
     var href = this.request.httpRequest.endpoint.href;
@@ -116,18 +116,22 @@ function viewAlbum(albumName) {
         '</div>',
         '<div>',
         '<span onclick="deleteCheckFile(\'' + albumName + "','" + photoKey + '\')">',
-        'X',
-        '</span>',
+        '[X]',
+        '</span>',  
         '<span>',
         photoKey.replace(albumPhotosKey, ''),
+        '<span onclick="preprocessing()">',
+        '[preprocessing]',
         '</span>',
+        '</span>',
+
         '</div>',
         '</span>',
       ]);
     });
     var message = photos.length -1?
       '<p>Click on the X to delete the file</p>' :
-      '<p>You do not have any photos in this album. Please add file.</p>';
+      '<p>You do not have any file in this directory. Please add file.</p>';
     var htmlTemplate = [
       '<h2>',
       'Directory: ' + albumName,
@@ -143,9 +147,15 @@ function viewAlbum(albumName) {
       '<button onclick="listAlbums()">',
       'Back',
       '</button>',
+
     ]
     document.getElementById('app').innerHTML = getHtml(htmlTemplate);
   });
+}
+
+
+function preprocessing(){
+  alert('Successfully send.');
 }
 
 function deleteCheckFile(albumName,photoKey){
