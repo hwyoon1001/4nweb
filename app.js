@@ -154,8 +154,33 @@ function viewAlbum(albumName) {
 }
 
 
-function preprocessing(){
-  alert('Successfully send.');
+function preprocessing(albumName,photoKey){
+
+         var URL = "https://mdlhrmv13j.execute-api.us-east-1.amazonaws.com/prod/contact-us";
+
+       var data = {
+        "key1": "albumName",
+        "key2": "photoKey"
+        };
+
+       $.ajax({
+         type: "POST",
+         url : "https://mdlhrmv13j.execute-api.us-east-1.amazonaws.com/prod/contact-us",
+         dataType: "json",
+         crossDomain: "true",
+         contentType: "application/json; charset=utf-8",
+         data: JSON.stringify(data),
+
+         
+         success: function () {
+           // clear form and show a success message
+           alert("Preprocessing Done");
+
+         },
+         error: function () {
+           // show an error message
+           alert("Preprocessing Error");
+         }});
 }
 
 function deleteCheckFile(albumName,photoKey){
